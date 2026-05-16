@@ -30,3 +30,12 @@ SECRET_KEY = os.environ.get("HMAC_SECRET", "SuperSecretKey@67!").encode("utf-8")
 HOST = "127.0.0.1"
 PORT = 65432
 BUFFER_SIZE = 4096
+
+def verify_hmac(message: str, received_hmac: str) -> bool:
+    expected_hmac = hmac.new(
+        SECRET_KEY,
+        message.encode("utf-8"),
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(expected_hmac, received_hmac)
