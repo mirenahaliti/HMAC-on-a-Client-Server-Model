@@ -1,7 +1,7 @@
 # HMAC-on-a-Client-Server-Model
 ### Siguria e të Dhënave — Projekti 3
 
----
+--
 
 ## Përshkrim i Projektit
 
@@ -28,7 +28,7 @@ hmac_project/
 
 ---
 
-## ⚙️ Kërkesat e Sistemit
+##  Kërkesat e Sistemit
 
 | Kërkesë       | Detaj                              |
 |---------------|------------------------------------|
@@ -61,7 +61,6 @@ Serveri do të fillojë të dëgjojë lidhje dhe do të shfaqë:
 ```
 =======================================================
    HMAC Authentication Server
-   Siguria e të Dhënave — Projekt Akademik
 =======================================================
    Host    : 127.0.0.1
    Port    : 65432
@@ -125,7 +124,7 @@ python client.py
 
 ---
 
-##Çelësi Sekret i Përbashkët
+## Çelësi Sekret i Përbashkët
 
 Çelësi default është i koduar në kod:
 
