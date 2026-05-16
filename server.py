@@ -38,32 +38,57 @@ def verify_hmac(message: str, received_hmac: str) -> bool:
     ).hexdigest()
 
     return hmac.compare_digest(expected_hmac, received_hmac)
+def _send_response(conn: socket.socket, status: str, detail: str) -> None:
+    """
+    Dërgon përgjigjen JSON tek klienti.
+    
+    Parametrat:
+        conn   -- Lidhja socket
+        status -- "OK", "FAIL", ose "ERROR"
+        detail -- Mesazhi i detajuar i statusit
+    """
+    response = json.dumps({
+        "status": status,
+        "detail": detail,
+        "server_time": datetime.datetime.now().isoformat()
+    })
+    conn.sendall(response.encode("utf-8"))
+    logger.info(f"Përgjigje dërguar → Status: {status} | {detail}")
 
-def handle_client(conn: socket.socket, addr: tuple) -> None:
-    logger.info(f"Lidhje e re nga klienti: {addr}")
-    print(f"\n{'─'*55}")
-    print(f"  Klient i ri i lidhur: {addr[0]}:{addr[1]}")
-    print(f"{'─'*55}")
 
-    try:
-        raw_data = conn.recv(BUFFER_SIZE)
-        if not raw_data:
-            logger.warning("Klienti u shkëput pa dërguar të dhëna.")
-            return
+def start_server() -> None:
+    """
+    Nis serverin dhe pret lidhje nga klientët.
+    Trajton çdo lidhje në mënyrë sekuenciale.
+    """
+    print("=" * 55)
+    print("   HMAC Authentication Server")
+    print("   Siguria e të Dhënave")
+    print("=" * 55)
+    print(f"   Host    : {HOST}")
+    print(f"   Port    : {PORT}")
+    print(f"   Log file: {LOG_FILE}")
+    print("=" * 55)
+
+    logger.info(f"Serveri po niset në {HOST}:{PORT}")
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_sock:
+        # SO_REUSEADDR: lejojmë ripërdorimin e portit pas mbylljes
+        server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_sock.bind((HOST, PORT))
+        server_sock.listen(5)
+
+        print(f"\n Serveri është aktiv dhe pret mesazhe...\n")
+        logger.info("Serveri filloi të dëgjojë lidhje.")
+
         try:
-            payload = json.loads(raw_data.decode("utf-8"))
-        except json.JSONDecodeError:
-            logger.error("Gabim: Formati i paketës është i pasaktë (jo JSON).")
-            _send_response(conn, status="ERROR", detail="Paketa nuk është JSON e vlefshme.")
-            return
+            while True:
+                conn, addr = server_sock.accept()
+                handle_client(conn, addr)
+        except KeyboardInterrupt:
+            print("\n\n Serveri u ndal nga përdoruesi (Ctrl+C).")
+            logger.info("Serveri u ndal me Ctrl+C.")
 
-        message  = payload.get("message", "")
-        recv_hmac = payload.get("hmac", "")
-        timestamp = payload.get("timestamp", "N/A")
 
-        # ── Shfaqje në konsol ──────────────────────────────
-        print(f"\n   Mesazh i marrë:")
-        print(f"     Teksti   : {message}")
-        print(f"     HMAC     : {recv_hmac[:16]}...{recv_hmac[-8:]}")
-        print(f"     Koha     : {timestamp}")
-        logger.info(f"Mesazh marrë | Teksti: '{message}' | HMAC: {recv_hmac[:20]}...")
+if __name__ == "__main__":
+    start_server()
