@@ -1,7 +1,7 @@
 # HMAC-on-a-Client-Server-Model
-### Siguria e të Dhënave — Projekti 3
+## Siguria e të Dhënave — Projekti 3
 
---
+---
 
 ## Përshkrim i Projektit
 
