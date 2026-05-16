@@ -38,7 +38,36 @@ def verify_hmac(message: str, received_hmac: str) -> bool:
     ).hexdigest()
 
     return hmac.compare_digest(expected_hmac, received_hmac)
- print(f"\n Duke validuar HMAC...")
+
+def handle_client(conn: socket.socket, addr: tuple) -> None:
+    logger.info(f"Lidhje e re nga klienti: {addr}")
+    print(f"\n{'─'*55}")
+    print(f"  Klient i ri i lidhur: {addr[0]}:{addr[1]}")
+    print(f"{'─'*55}")
+
+    try:
+        raw_data = conn.recv(BUFFER_SIZE)
+        if not raw_data:
+            logger.warning("Klienti u shkëput pa dërguar të dhëna.")
+            return
+        try:
+            payload = json.loads(raw_data.decode("utf-8"))
+        except json.JSONDecodeError:
+            logger.error("Gabim: Formati i paketës është i pasaktë (jo JSON).")
+            _send_response(conn, status="ERROR", detail="Paketa nuk është JSON e vlefshme.")
+            return
+
+        message  = payload.get("message", "")
+        recv_hmac = payload.get("hmac", "")
+        timestamp = payload.get("timestamp", "N/A")
+
+        # ── Shfaqje në konsol ──────────────────────────────
+        print(f"\n   Mesazh i marrë:")
+        print(f"     Teksti   : {message}")
+        print(f"     HMAC     : {recv_hmac[:16]}...{recv_hmac[-8:]}")
+        print(f"     Koha     : {timestamp}")
+        logger.info(f"Mesazh marrë | Teksti: '{message}' | HMAC: {recv_hmac[:20]}...")
+        print(f"\n Duke validuar HMAC...")
         logger.info("Duke verifikuar HMAC...")
 
         if not message or not recv_hmac:
@@ -65,7 +94,7 @@ def verify_hmac(message: str, received_hmac: str) -> bool:
     finally:
         conn.close()
         logger.info(f"Lidhja me {addr} u mbyll.")
-        print(f"\n{'─'*55}"
+        print(f"\n{'─'*55}")
 def _send_response(conn: socket.socket, status: str, detail: str) -> None:
     """
     Dërgon përgjigjen JSON tek klienti.
