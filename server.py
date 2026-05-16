@@ -2,8 +2,7 @@
 =============================================================
   HMAC Authentication Server - Siguria e të Dhënave
 =============================================================
-Ky server pret mesazhe nga klientët, verifikon autenticitetin
-dhe integritetin e tyre duke përdorur HMAC-SHA256.
+
 """
 import socket
 import hmac
