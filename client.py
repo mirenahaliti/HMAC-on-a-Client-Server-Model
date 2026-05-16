@@ -61,3 +61,36 @@ def generate_hmac(message: str) -> str:
         hashlib.sha256
     )
     return mac.hexdigest()
+
+def send_message(message: str) -> dict:
+    """
+    Dërgon mesazhin me HMAC-in te serveri dhe merr përgjigjen.
+    
+    Parametrat:
+        message -- Teksti i mesazhit
+    
+    Kthen:
+        Fjalorin JSON të përgjigjes nga serveri
+    
+    Shkakton:
+        ConnectionRefusedError nëse serveri nuk është aktiv
+        TimeoutError nëse lidhja skadon
+        Exception për gabime të tjera rrjeti
+    """
+    # ── Gjenerimi i HMAC-it ──────────────────────────────
+    logger.info(f"Duke gjeneruar HMAC për mesazhin: '{message}'")
+    mac_value = generate_hmac(message)
+    logger.info(f"HMAC gjeneruar: {mac_value[:20]}...")
+
+    # ── Ndërtimi i paketës JSON ──────────────────────────
+    payload = json.dumps({
+        "message": message,
+        "hmac": mac_value,
+        "timestamp": datetime.datetime.now().isoformat()
+    })
+
+    # ── Shfaqja në konsol ────────────────────────────────
+    print(f"\n   Duke dërguar mesazhin me HMAC:")
+    print(f"     Teksti : {message}")
+    print(f"     HMAC   : {mac_value[:16]}...{mac_value[-8:]}")
+    logger.info(f"Paketa gati | Dërgim te {HOST}:{PORT}")
