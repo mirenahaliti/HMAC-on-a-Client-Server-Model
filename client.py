@@ -96,7 +96,7 @@ def send_message(message: str) -> dict:
         raw_response = sock.recv(BUFFER_SIZE)
         response = json.loads(raw_response.decode("utf-8"))
         return response
-    def display_response(response: dict) -> None:
+def display_response(response: dict) -> None:
     """
     Shfaq përgjigjen e serverit në formë të lexueshme.
     
@@ -185,16 +185,3 @@ def run_client() -> None:
 
 if __name__ == "__main__":
     run_client()
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.settimeout(10)  # Timeout 10 sekonda
-        sock.connect((HOST, PORT))
-        logger.info(f"Lidhja me {HOST}:{PORT} u realizua.")
-
-        # Dërgoj paketën
-        sock.sendall(payload.encode("utf-8"))
-        logger.info("Paketa u dërgua. Duke pritur përgjigjen...")
-
-        # Marr përgjigjen
-        raw_response = sock.recv(BUFFER_SIZE)
-        response = json.loads(raw_response.decode("utf-8"))
-        return response
