@@ -18,11 +18,11 @@ Ky projekt implementon një sistem komunikimi të sigurt mes klientit dhe server
 ## Struktura e Projektit
 
 ```
-hmac_project/
 ├── server.py        ← Serveri: verifikon HMAC-et e pranuara
 ├── client.py        ← Klienti: gjeneron dhe dërgon HMAC-et
 ├── server_log.txt   ← Krijohet automatikisht gjatë ekzekutimit
 ├── client_log.txt   ← Krijohet automatikisht gjatë ekzekutimit
+├── .gitignore       ← File për përjashtime nga Git
 └── README.md        ← Ky skedar
 ```
 
@@ -44,9 +44,14 @@ hmac_project/
 
 ### Hapi 1 — Klononi / hapni direktorinë e projektit
 
-```bash
-cd hmac_project
-```
+Nëse projekti nuk është shkarkuar ende, klonojeni nga GitHub:
+
+    git clone https://github.com/mirenahaliti/HMAC-on-a-Client-Server-Model.git
+
+Pastaj hyni në folderin e projektit:
+
+    cd HMAC-on-a-Client-Server-Model
+
 
 ### Hapi 2 — Nisni Serverin
 
@@ -146,13 +151,18 @@ python client.py
 ```
 
 **Windows (PowerShell):**
-```powershell
-$env:HMAC_SECRET = "ÇelësiJuajSekretIFortë!"
-python server.py
-```
 
-> **Kujdes:** Klienti dhe serveri **duhet të kenë të njëjtin çelës** ose verifikimi do të dështojë.
+Në terminalin e parë për serverin:
 
+    $env:HMAC_SECRET = "ÇelësiJuajSekretIFortë!"
+    python server.py
+
+Në terminalin e dytë për klientin:
+
+    $env:HMAC_SECRET = "ÇelësiJuajSekretIFortë!"
+    python client.py
+
+> Kujdes: Klienti dhe serveri duhet të kenë të njëjtin çelës ose verifikimi do të dështojë.
 ---
 
 ## Protokolli i Komunikimit
