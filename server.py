@@ -38,6 +38,34 @@ def verify_hmac(message: str, received_hmac: str) -> bool:
     ).hexdigest()
 
     return hmac.compare_digest(expected_hmac, received_hmac)
+ print(f"\n Duke validuar HMAC...")
+        logger.info("Duke verifikuar HMAC...")
+
+        if not message or not recv_hmac:
+            logger.warning("Paketa mungon fushat 'message' ose 'hmac'.")
+            _send_response(conn, status="ERROR", detail="Fushat 'message' dhe 'hmac' janë të detyrueshme.")
+            return
+
+        is_valid = verify_hmac(message, recv_hmac)
+
+        if is_valid:
+            print(f"\n HMAC VALID — Mesazhi është autentik dhe i paprekur!")
+            logger.info("VERIFIKIM I SUKSESSHËM: Mesazhi është autentik dhe integritetin e ka.")
+            _send_response(conn, status="OK", detail="Mesazhi u verifikua me sukses. Integriteti dhe autenticiteti konfirmohet.")
+        else:
+            print(f"\n HMAC INVALID — Mesazhi është i falsifikuar ose i ndryshuar!")
+            logger.warning("VERIFIKIM DËSHTOI: HMAC nuk përputhet. Mesazhi është i komprometuar.")
+            _send_response(conn, status="FAIL", detail="Verifikimi dështoi. HMAC nuk përputhet — mesazhi mund të jetë modifikuar.")
+
+    except ConnectionResetError:
+        logger.warning(f"Klienti {addr} e ndërpreu lidhjen papritur.")
+    except Exception as exc:
+        logger.error(f"Gabim i papritur gjatë trajtimit të klientit {addr}: {exc}")
+        _send_response(conn, status="ERROR", detail=f"Gabim i brendshëm i serverit: {exc}")
+    finally:
+        conn.close()
+        logger.info(f"Lidhja me {addr} u mbyll.")
+        print(f"\n{'─'*55}"
 def _send_response(conn: socket.socket, status: str, detail: str) -> None:
     """
     Dërgon përgjigjen JSON tek klienti.
@@ -92,3 +120,4 @@ def start_server() -> None:
 
 if __name__ == "__main__":
     start_server()
+   
